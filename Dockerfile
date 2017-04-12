@@ -9,7 +9,7 @@ ENV ELASTALERT_HOME /opt/elastalert
 
 ENV ELASTALERT_CONFIG ${CONFIG_DIR}/elastalert_config.yaml
 
-ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/master.zip
+ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/v0.1.8.zip
 
 WORKDIR /opt
 
@@ -24,9 +24,7 @@ WORKDIR ${ELASTALERT_HOME}
 
 # Install Elastalert.
 RUN python setup.py install && \
-    pip install -e . && \
-    pip uninstall twilio --yes && \
-    pip install twilio==6.0.0
+    pip install -e .
 
 # Create directories.
 RUN mkdir -p ${CONFIG_DIR} && \
