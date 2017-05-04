@@ -5,27 +5,34 @@ MAINTAINER Dmitry Shmelev, https://github.com/dshmelev
 ENV CONFIG_DIR /opt/config
 ENV RULES_DIR /opt/rules
 ENV LOG_DIR /opt/logs
+ENV ELASTALERT_HOME /opt/elastalert
+
 ENV ELASTALERT_CONFIG ${CONFIG_DIR}/elastalert_config.yaml
 
-ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/v0.1.8.zip
+ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/master.zip
 
-# Create directories.
-RUN mkdir -p ${CONFIG_DIR} ${RULES_DIR} ${LOG_DIR}
+WORKDIR /opt
 
-# Install/Download deps and src
 RUN apk add --no-cache --update python-dev gcc ca-certificates openssl openssl-dev musl-dev libffi-dev && \
     easy_install pip && \
-    cd /usr/src/ && \
     wget ${ELASTALERT_URL} && \
     unzip *.zip && \
-    rm *.zip
+    rm *.zip && \
+    mv elastalert* ${ELASTALERT_HOME}
+
+WORKDIR ${ELASTALERT_HOME}
 
 # Install Elastalert.
-RUN cd /usr/src/elastalert* && \
-    python setup.py install && \
+RUN python setup.py install && \
     pip install -e . && \
-    cp config.yaml.example ${ELASTALERT_CONFIG}
+    pip uninstall twilio --yes && \
+    pip install twilio==6.0.0
 
+# Create directories.
+RUN mkdir -p ${CONFIG_DIR} && \
+    mkdir -p ${RULES_DIR} && \
+    mkdir -p ${LOG_DIR} && \
+    cp ${ELASTALERT_HOME}/config.yaml.example ${ELASTALERT_CONFIG}
 
 # Clean up.
 RUN apk del python-dev && \
@@ -36,4 +43,4 @@ RUN apk del python-dev && \
 
 VOLUME [ "${CONFIG_DIR}", "${RULES_DIR}", "${LOG_DIR}"]
 
-CMD elastalert --config ${ELASTALERT_CONFIG} --verbose
+CMD python ${ELASTALERT_HOME}/elastalert/elastalert.py --config ${ELASTALERT_CONFIG} --verbose
