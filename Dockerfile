@@ -1,13 +1,13 @@
 FROM python:2-alpine
 
-MAINTAINER Dmitry Shmelev, https://github.com/dshmelev
+MAINTAINER OneTwoTrip DevOps Team, https://github.com/onetwotrip
 
 ENV CONFIG_DIR /opt/config
 ENV RULES_DIR /opt/rules
 ENV LOG_DIR /opt/logs
 ENV ELASTALERT_CONFIG ${CONFIG_DIR}/elastalert_config.yaml
 
-ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/v0.1.8.zip
+ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/v0.1.32.zip
 
 # Create directories.
 RUN mkdir -p ${CONFIG_DIR} ${RULES_DIR} ${LOG_DIR}
