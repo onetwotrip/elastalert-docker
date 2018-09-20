@@ -6,8 +6,9 @@ ENV CONFIG_DIR /opt/config
 ENV RULES_DIR /opt/rules
 ENV LOG_DIR /opt/logs
 ENV ELASTALERT_CONFIG ${CONFIG_DIR}/elastalert_config.yaml
+ENV ELASTALERT_VERSION 0.1.32
 
-ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/v0.1.32.zip
+ENV ELASTALERT_URL https://github.com/Yelp/elastalert/archive/v${ELASTALERT_VERSION}.zip
 
 # Create directories.
 RUN mkdir -p ${CONFIG_DIR} ${RULES_DIR} ${LOG_DIR}
@@ -21,11 +22,13 @@ RUN apk add --no-cache --update python-dev gcc ca-certificates openssl openssl-d
     rm *.zip
 
 # Install Elastalert.
-RUN cd /usr/src/elastalert* && \
+RUN cd /usr/src/elastalert-${ELASTALERT_VERSION} && \
     python setup.py install && \
     pip install -e . && \
     cp config.yaml.example ${ELASTALERT_CONFIG}
 
+# Copy modules
+COPY elastalert_modules /usr/src/elastalert-${ELASTALERT_VERSION}/elastalert_modules
 
 # Clean up.
 RUN apk del python-dev && \
